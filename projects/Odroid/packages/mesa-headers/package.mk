@@ -16,19 +16,19 @@
 #  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="mali-headers"
-PKG_VERSION="10.3.5"
+PKG_NAME="mesa-headers"
+PKG_VERSION="11.0.0"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.mesa3d.org/"
-PKG_URL="ftp://freedesktop.org/pub/mesa/older-versions/10.x/$PKG_VERSION/MesaLib-$PKG_VERSION.tar.bz2"
+PKG_URL="ftp://freedesktop.org/pub/mesa/$PKG_VERSION/mesa-$PKG_VERSION.tar.xz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
 PKG_SECTION="devel"
 PKG_SHORTDESC="Mesa headers for Mali"
 PKG_LONGDESC="Mesa headers for Mali"
-PKG_SOURCE_DIR="Mesa-$PKG_VERSION"
+PKG_SOURCE_DIR="mesa-$PKG_VERSION"
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
