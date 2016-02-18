@@ -16,14 +16,14 @@
 #  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
-PKG_NAME="hk-opengl-mali"
+PKG_NAME="hk-mali"
 PKG_VERSION="31d5c21"
 PKG_REV="1"
 PKG_ARCH="arm"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://openlinux.amlogic.com:8000/download/ARM/filesystem/"
 PKG_URL="$ODROID_MIRROR/$PKG_NAME-$PKG_VERSION.tar.xz"
-PKG_DEPENDS_TARGET="toolchain"
+PKG_DEPENDS_TARGET="toolchain mesa-headers:host"
 PKG_PRIORITY="optional"
 PKG_SECTION="graphics"
 PKG_SHORTDESC="HardKernel's OpenGL ES pre-compiled libraries for Mali 400 GPUs found in Amlogic Meson6 SoCs"
@@ -39,8 +39,6 @@ make_target() {
 makeinstall_target() {
   mkdir -p $SYSROOT_PREFIX/usr/lib
     cp -PR fbdev/mali_libs/*.so* $SYSROOT_PREFIX/usr/lib
-  mkdir -p $SYSROOT_PREFIX/usr/include
-    cp -PR fbdev/mali_headers/* $SYSROOT_PREFIX/usr/include
   mkdir -p $INSTALL/usr/lib
     cp -PR fbdev/mali_libs/*.so* $INSTALL/usr/lib
 }

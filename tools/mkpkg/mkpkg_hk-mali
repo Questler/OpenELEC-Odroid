@@ -22,7 +22,7 @@
 
 TOPDIR=$(pwd)
 GIT_FLAGS="${GIT_FLAGS:=-q}"
-PKG_NAME="hk-opengl-mali"
+PKG_NAME="hk-mali"
 
 sources() {
   echo -n "Getting Sources ... "
