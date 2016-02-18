@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="kodi"
-PKG_VERSION="16.0-beta5-19fc4fa"
+PKG_VERSION="16.0-rc3-34d1e49"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -44,6 +44,8 @@ if [ "$DISPLAYSERVER" = "x11" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libX11 libXext libdrm libXrandr"
   KODI_XORG="--enable-x11"
 else
+  KODI_CFLAGS="-DMESA_EGL_NO_X11_HEADERS"
+  KODI_CXXFLAGS="-DMESA_EGL_NO_X11_HEADERS"
   KODI_XORG="--disable-x11"
 fi
 
