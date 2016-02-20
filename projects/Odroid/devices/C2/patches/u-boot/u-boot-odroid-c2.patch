@@ -18865,7 +18865,7 @@ index 0000000..6774e37
 +#include <cli_hush.h>
 +#endif
 +
-+#define BOOTINI_MAGIC	"ODROIDC2-UBOOT-CONFIG"
++#define BOOTINI_MAGIC	"ODROID-C2-UBOOT-CONFIG"
 +#define SZ_BOOTINI		SZ_64K
 +
 +/* Nothing to proceed with zero size string or comment.
