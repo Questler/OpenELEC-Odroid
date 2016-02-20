@@ -15,7 +15,7 @@
     UBOOT_CONFIG=""
 
   # Kernel target for u-boot (default 'uImage' if BOOTLOADER=u-boot) (uImage / zImage)
-   KERNEL_UBOOT_TARGET="uImage"
+   KERNEL_UBOOT_TARGET="Image"
 
   # Target Configfile for u-boot
     UBOOT_CONFIGFILE="boot.ini"
@@ -61,4 +61,8 @@
   # set the addon dirs
     ADDON_PATH="$ADDON_VERSION/$PROJECT/$DEVICE"
     ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
+
+  # extra build dependeices
+    EXTRA_DEPS="mkimage"
+    EXTRA_DEPS_PKG="u-boot-tools"
 
