@@ -19,59 +19,81 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
+TOPDIR=$(pwd)
+GIT_FLAGS="${GIT_FLAGS:=-q}"
+HK_GIT="https://github.com/hardkernel/u-boot"
+
 usage() {
-  echo "$0 XU3|U2|C1"
-  echo " ex. $0 XU3"
+  echo "$0 XU3|U2|C1|C2"
+  echo "  ex. $0 XU3"
   exit 1
 }
 
-echo "getting sources..."
-  case $1 in
-    experimental|ex|ng)
-      NG=1
-      if [ ! -d u-boot-odroid-ng ]; then
-        git clone git://github.com/hardkernel/u-boot.git u-boot-odroid-ng
-      fi
+sources() {
+  echo -n "Getting Sources ... "
 
-      cd u-boot-odroid-ng
-      ;;
-    *)
-      NG=0
-      if [ ! -d u-boot-odroid ]; then
-        git clone git://github.com/hardkernel/u-boot.git u-boot-odroid
-      fi
+  cd $TOPDIR
 
-      cd u-boot-odroid
-      ;;
-  esac
+  if [ ! -d hk-bootloader.git ]; then
+    git clone $GIT_FLAGS $HK_GIT hk-bootloader.git
+  fi
 
-  git reset --hard
-  git clean -fdx
-  case $1 in
-    XU3|xu3) git checkout -m odroidxu3-v2012.07 ;;
-    U2|U3|u2|u3) git checkout -m odroid-v2010.12 ;;
-    C1|c1) git checkout -m odroidc-v2011.03 ;;
-    experimental|ex|ng) git checkout -m master ;;
-  esac
-  git pull
-  [ -n $2 ] && git reset --hard $2
+  cd $TOPDIR/hk-bootloader.git
+
+  git reset $GIT_FLAGS --hard
+  git clean $GIT_FLAGS -fd
+
+  git checkout $GIT_FLAGS -m $BRANCH
+
+  git pull $GIT_FLAGS
+
+  if [ -n $2 ]; then
+    git reset $GIT_FLAGS --hard $2
+    git clean $GIT_FLAGS -fd
+  fi
+
   GIT_REV=`git log -n1 --format=%h`
   sed -i "s|^EXTRAVERSION[[:space:]]*=.*$|EXTRAVERSION = +$GIT_REV|" Makefile
   VERSION="$(grep \^VERSION Makefile | head -1 | awk '{print $3}').$(grep \^PATCHLEVEL Makefile | awk '{print $3}')+$GIT_REV"
-  cd ..
 
-echo "copying sources..."
-  rm -rf u-boot-$VERSION
-  case $NG in
-    0) cp -a u-boot-odroid u-boot-$VERSION ;;
-    1) cp -a u-boot-odroid-ng u-boot-$VERSION ;;
-  esac
+  echo "DONE"
+}
 
-echo "cleaning sources..."
+package() {
+  cd $TOPDIR
+
+  if [ -d u-boot-$VERSION ]; then
+    echo -n "Cleaning Old Release ... "
+    rm -rf u-boot-$VERSION
+    echo "DONE"
+  fi
+
+  echo -n "Copying GIT to Release ... "
+  cp -a hk-bootloader.git u-boot-$VERSION
+  echo "DONE"
+
+  echo -n "Cleaning Source ... "
   rm -rf u-boot-$VERSION/.git
+  echo "DONE"
 
-echo "packing sources..."
+  echo -n "Compressing Source ... "
   tar cJf u-boot-$VERSION.tar.xz u-boot-$VERSION
+  echo "DONE"
 
-echo "remove temporary sourcedir..."
+  echo -n "Final Cleanup ... "
   rm -rf u-boot-$VERSION
+  echo "DONE"
+}
+
+if [ -z $1 ]; then
+  usage
+else
+  case $1 in
+    U2|u2|U3|u3) BRANCH="odroid-v2010.12"    ; BUILD=U2  ;;
+    XU3|xu3)     BRANCH="odroidxu3-v2012.07" ; BUILD=XU3 ;;
+    C1|c1)       BRANCH="odroidc-v2011.03"   ; BUILD=C1  ;;
+    C2|c2)       BRANCH="odroidc2-v2015.01"  ; BUILD=C2  ;;
+  esac
+  sources $1 $2
+  package $1
+fi

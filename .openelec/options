@@ -1,0 +1,56 @@
+################################################################################
+# setup build defaults
+################################################################################
+
+  # Build optimizations (size/normal)
+    OPTIMIZATIONS="size"
+
+  # LTO (Link Time Optimization) support
+    LTO_SUPPORT="yes"
+
+  # GOLD (Google Linker) support
+    GOLD_SUPPORT="yes"
+
+  # SquashFS compression method (gzip / lzo / xz)
+    SQUASHFS_COMPRESSION="gzip"
+
+  # Bootloader to use (syslinux / u-boot / bcm2835-bootloader)
+    BOOTLOADER="u-boot"
+
+################################################################################
+# setup project defaults/overrides
+################################################################################
+
+  # build and install ALSA Audio support : Additional
+    ALSA_SUPPORT="yes"
+
+  # OpenGL(X) implementation to use : Override
+    OPENGL="no"
+
+  # LCD driver to Use : Override
+    LCD_DRIVER="none"
+
+  # KODI DCADEC support (yes / no) : Override
+    DCADEC_SUPPORT="yes"
+
+  # additional Firmware to use : Additional
+    FIRMWARE="$FIRMWARE dvb-firmware rtlnic-firmware samsung-firmware wlan-firmware"
+
+  # build and install PPP support : Override
+    PPTP_SUPPORT="no"
+
+  # build and install OpenVPN support : Override
+    OPENVPN_SUPPORT="no"
+
+  # Distribution Specific source location : Additional
+    # ODROID_MIRROR="http://freeweb.mine.nu/zalaare"
+    ODROID_MIRROR="http://zalaare.homenet.org/odroid"
+
+  # set the addon server
+    ADDON_SERVER_URL="https://raw.github.com/zalaare/OpenELEC-Odroid-Addons"
+
+  # OEM packages for OEM's (yes / no)
+    OEM_SUPPORT="yes"
+
+  # build with installer (yes / no)
+    INSTALLER_SUPPORT="no"

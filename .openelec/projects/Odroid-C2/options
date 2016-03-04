@@ -1,0 +1,67 @@
+################################################################################
+# setup system defaults
+################################################################################
+
+  # Setup controls which processor should be targeted for generated code. : Override
+    TARGET_ARCH=aarch64
+    TARGET_CPU="cortex-a53"
+    TARGET_FLOAT="hard"
+    TARGET_FPU="neon"
+
+  # u-boot version to use (default)
+    UBOOT_VERSION="default"
+
+  # Configuration for u-boot
+    UBOOT_CONFIG="odroidc2_defconfig"
+
+  # Kernel target (bzImage, zImage, uImage, Image)
+    KERNEL_TARGET="Image"
+
+  # Target Configfile for u-boot
+    UBOOT_CONFIGFILE="boot.ini"
+
+  # Additional u-boot make parameters (for example to just build u-boot.bin)
+    UBOOT_MAKE_EXTRACMD=""
+
+  # Additional kernel make parameters (for example to specify the u-boot loadaddress)
+    KERNEL_MAKE_EXTRACMD="dtbs"
+
+################################################################################
+# setup project defaults/overrides
+################################################################################
+
+  # OpenGL-ES implementation to use : Override
+    OPENGLES="mali"
+
+  # Displayserver to use : Override
+    DISPLAYSERVER="no"
+
+  # Windowmanager to use : Override
+    WINDOWMANAGER="none"
+
+  # Xorg Graphic drivers to use (all / i915,i965,r200,r300,r600,nvidia,nouveau)
+  # Space separated list is supported,
+  # e.g. GRAPHIC_DRIVERS="i915 i965 r300 r600 radeonsi nvidia nouveau"
+    GRAPHIC_DRIVERS=""
+
+    ADDITIONAL_DRIVERS=""
+
+  # additional Firmware to use : Additional
+    FIRMWARE="${FIRMWARE/samsung-firmware/}"
+
+  # KODI Player implementation to use : (odroid-mfc / odroid-amcodec)
+    KODIPLAYER_DRIVER="odroid-amcodec"
+
+  # KODI Joystick support
+    JOYSTICK_SUPPORT="no"
+
+  # Auto resize of Storage partition (during build of SD image) (yes / no) : Additional
+    RESIZE="yes"
+
+  # set the addon dirs
+    ADDON_PATH="$ADDON_VERSION/$PROJECT/$DEVICE"
+    ADDON_URL="$ADDON_SERVER_URL/$ADDON_PATH"
+
+  # extra build dependeices
+    EXTRA_DEPS="mkimage"
+    EXTRA_DEPS_PKG="u-boot-tools"

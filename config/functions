@@ -55,8 +55,10 @@ setup_toolchain() {
 }
 
 kernel_path() {
-  if [ -e $ROOT/projects/$PROJECT/devices/$DEVICE/packages/linux/package.mk ]; then
-    . $ROOT/projects/$PROJECT/devices/$DEVICE/packages/linux/package.mk
+  if [ -e $HOME/.openelec/projects/$PROJECT/packages/linux/package.mk ]; then
+    . $HOME/.openelec/projects/$PROJECT/packages/linux/package.mk
+  elif [ -e $HOME/.openelec/packages/linux/package.mk ]; then
+    . $HOME/.openelec/packages/linux/package.mk
   elif [ -e $ROOT/projects/$PROJECT/packages/linux/package.mk ]; then
     . $ROOT/projects/$PROJECT/packages/linux/package.mk
   else
@@ -67,8 +69,10 @@ kernel_path() {
 }
 
 kernel_version() {
-  if [ -e $ROOT/projects/$PROJECT/devices/$DEVICE/packages/linux/package.mk ]; then
-    . $ROOT/projects/$PROJECT/devices/$DEVICE/packages/linux/package.mk
+  if [ -e $HOME/.openelec/projects/$PROJECT/packages/linux/package.mk ]; then
+    . $HOME/.openelec/projects/$PROJECT/packages/linux/package.mk
+  elif [ -e $HOME/.openelec/packages/linux/package.mk ]; then
+    . $HOME/.openelec/packages/linux/package.mk
   elif [ -e $ROOT/projects/$PROJECT/packages/linux/package.mk ]; then
     . $ROOT/projects/$PROJECT/packages/linux/package.mk
   else
@@ -86,17 +90,22 @@ get_module_dir() {
 # get package's build dir
 get_build_dir() {
   if [ ! -z $1 ] ; then
-    local _PKG_DIR=$(find $ROOT/projects/$PROJECT/devices/$DEVICE/packages -name $1 2>/dev/null)
+    local _PKG_DIR=$(find $HOME/.openelec/projects/$PROJECT/packages -name $1 2>/dev/null)
     if [ -d "$_PKG_DIR" -a -f $_PKG_DIR/package.mk ] ; then
       . $_PKG_DIR/package.mk
     else
-      local _PKG_DIR=$(find $ROOT/projects/$PROJECT/packages -name $1 2>/dev/null)
+      local _PKG_DIR=$(find $HOME/.openelec/packages -name $1 2>/dev/null)
       if [ -d "$_PKG_DIR" -a -f $_PKG_DIR/package.mk ] ; then
         . $_PKG_DIR/package.mk
       else
-        local _PKG_DIR=$(find $ROOT/packages -name $1 2>/dev/null)
+        local _PKG_DIR=$(find $ROOT/projects/$PROJECT/packages -name $1 2>/dev/null)
         if [ -d "$_PKG_DIR" -a -f $_PKG_DIR/package.mk ] ; then
           . $_PKG_DIR/package.mk
+        else
+          local _PKG_DIR=$(find $ROOT/packages -name $1 2>/dev/null)
+          if [ -d "$_PKG_DIR" -a -f $_PKG_DIR/package.mk ] ; then
+            . $_PKG_DIR/package.mk
+          fi
         fi
       fi
     fi
@@ -272,20 +281,18 @@ dashes="==========================="
     exit 1
   fi
 
-  if [ "$PROJECT" != Odroid ]; then
-    if [ ! -f $PROJECT_DIR/$PROJECT/linux/linux.$TARGET_ARCH.conf && ! -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/linux/linux.$TARGET_ARCH.conf ]; then
-      check_arch="$check_arch\n $dashes$dashes$dashes"
-      check_arch="$check_arch\n ERROR: Architecture not found, use a valid Architecture"
-      check_arch="$check_arch\n for your project or create a new config"
-      check_arch="$check_arch\n $dashes$dashes$dashes"
-      check_arch="$check_arch\n\n Valid Architectures for your project: $PROJECT"
+  if [ ! -f $PROJECT_DIR/$PROJECT/linux/linux.$TARGET_ARCH.conf ]; then
+    check_arch="$check_arch\n $dashes$dashes$dashes"
+    check_arch="$check_arch\n ERROR: Architecture not found, use a valid Architecture"
+    check_arch="$check_arch\n for your project or create a new config"
+    check_arch="$check_arch\n $dashes$dashes$dashes"
+    check_arch="$check_arch\n\n Valid Architectures for your project: $PROJECT"
 
-      for arch in $PROJECT_DIR/$PROJECT/linux/*.conf $PROJECT_DIR/$PROJECT/devices/$DEVICE/linux/*.conf; do
-        check_arch="$check_arch\n - $(basename $arch | cut -f2 -d".")"
-      done
-      echo -e $check_arch
-      exit 1
-    fi
+    for arch in $PROJECT_DIR/$PROJECT/linux/*.conf; do
+      check_arch="$check_arch\n - $(basename $arch | cut -f2 -d".")"
+    done
+    echo -e $check_arch
+    exit 1
   fi
 }
 
@@ -416,6 +423,7 @@ show_config() {
   config_message="$config_message\n $dashes$dashes"
 
   config_message="$config_message\n - Kodi version:\t\t\t $MEDIACENTER"
+  config_message="$config_message\n - Kodi include language files:\t\t $KODI_LANGUAGE_ADDONS"
   config_message="$config_message\n - Kodi nonfree support:\t\t $KODI_NONFREE_SUPPORT"
   config_message="$config_message\n - Kodi Blu-Ray support:\t\t $KODI_BLURAY_SUPPORT"
   if [ "$KODI_BLURAY_SUPPORT" = "yes" ] ; then

@@ -44,13 +44,7 @@ if [ "$OPENELEC_VERSION" = devel ]; then
   OPENELEC_VERSION=$OPENELEC_VERSION-$BUILD_DATE-r$GIT_BUILD-g$GIT_ABBREV
 fi
 
-if [ -z "$ODROID_VERSION" ]; then
-  TARGET_VERSION="$PROJECT.$TARGET_ARCH-$OPENELEC_VERSION"
-elif [ -z "$DEVICE" ]; then
-  TARGET_VERSION="$PROJECT-$ODROID_VERSION"
-else
-  TARGET_VERSION="$PROJECT-$DEVICE-$ODROID_VERSION"
-fi
+TARGET_VERSION="$PROJECT.$TARGET_ARCH-$OPENELEC_VERSION"
 IMAGE_NAME="$DISTRONAME-$TARGET_VERSION"
 if [ "$DEVEL_VERSION" = "devel" ] ; then
   IMAGE_NAME="$DISTRONAME-$PROJECT.$TARGET_ARCH-$OS_VERSION-$OPENELEC_VERSION"
@@ -197,17 +191,6 @@ fi
     done
   fi
 
-# copy device related files to filesystem
-  if [ -d "$PROJECT_DIR/$PROJECT/devices/$DEVICE/filesystem" ]; then
-    cp -PR $PROJECT_DIR/$PROJECT/devices/$DEVICE/filesystem/* $INSTALL
-    # install device specific systemd services
-    for service in $PROJECT_DIR/$PROJECT/devices/$DEVICE/filesystem/usr/lib/systemd/system/*.service ; do
-      if [ -f "$service" ] ; then
-        enable_service $(basename $service)
-      fi
-    done
-  fi
-
 # copy vendor project related files to filesystem
   if [ -d "$HOME/.openelec/projects/$PROJECT/filesystem" ]; then
     cp -PR $HOME/.openelec/projects/$PROJECT/filesystem/* $INSTALL
@@ -235,20 +218,12 @@ fi
     rm -rf $TARGET_IMG/$IMAGE_NAME.kernel
 
 # copy kernel to target dir
-  if [ "$BOOTLOADER" = "u-boot" ]; then
-    KERNEL_IMAGE="$KERNEL_UBOOT_TARGET"
-  elif [ "$BOOTLOADER" = "bcm2835-bootloader" ]; then
-    KERNEL_IMAGE="zImage"
-  else
-    KERNEL_IMAGE="bzImage"
-  fi
-
   if [ "$BOOTLOADER" = "bcm2835-bootloader" ]; then
     echo "injecting DeviceTreeBlobs to kernel..."
-    perl $BUILD/linux-$(kernel_version)/scripts/mkknlimg $BUILD/linux-$(kernel_version)/arch/$TARGET_KERNEL_ARCH/boot/$KERNEL_IMAGE $TARGET_IMG/$IMAGE_NAME.kernel
+    perl $BUILD/linux-$(kernel_version)/scripts/mkknlimg $BUILD/linux-$(kernel_version)/arch/$TARGET_KERNEL_ARCH/boot/$KERNEL_TARGET $TARGET_IMG/$IMAGE_NAME.kernel
     echo "...done"
   else
-    cp -PR $BUILD/linux-$(kernel_version)/arch/$TARGET_KERNEL_ARCH/boot/$KERNEL_IMAGE $TARGET_IMG/$IMAGE_NAME.kernel
+    cp -PR $BUILD/linux-$(kernel_version)/arch/$TARGET_KERNEL_ARCH/boot/$KERNEL_TARGET $TARGET_IMG/$IMAGE_NAME.kernel
   fi
   chmod 0644 $TARGET_IMG/$IMAGE_NAME.kernel
 
@@ -279,8 +254,10 @@ fi
       # remove n previous created release image
         rm -rf $TARGET_IMG/$IMAGE_NAME.img.gz
         if [ -n "$BOOTLOADER" ]; then
-          if [ -n "`find $PROJECT_DIR/$PROJECT/devices/$DEVICE/packages -type d -name $BOOTLOADER 2>/dev/null`" ]; then
-            BOOTLOADER_DIR=`find $PROJECT_DIR/$PROJECT/devices/$DEVICE/packages -type d -name $BOOTLOADER 2>/dev/null`
+          if [ -n "`find $HOME/.openelec/projects/$PROJECT/packages -type d -name $BOOTLOADER 2>/dev/null`" ]; then
+            BOOTLOADER_DIR=`find $HOME/.openelec/projects/$PROJECT/packages -type d -name $BOOTLOADER 2>/dev/null`
+          elif [ -n "`find $HOME/.openelec/packages -type d -name $BOOTLOADER 2>/dev/null`" ]; then
+            BOOTLOADER_DIR=`find $HOME/.openelec/packages -type d -name $BOOTLOADER 2>/dev/null`
           elif [ -n "`find $PROJECT_DIR/$PROJECT/packages -type d -name $BOOTLOADER`" ]; then
             BOOTLOADER_DIR=`find $PROJECT_DIR/$PROJECT/packages -type d -name $BOOTLOADER 2>/dev/null`
           else
@@ -288,15 +265,17 @@ fi
           fi
 
           if [ -z "$BOOTLOADER_DIR" -o ! -d "$BOOTLOADER_DIR" ]; then
-            BOOTLOADER_DIR=`find $PACKAGES -type d -name $BOOTLOADER 2>/dev/null`
+          	BOOTLOADER_DIR=`find $PACKAGES -type d -name $BOOTLOADER 2>/dev/null`
           fi
 
           if [ -d "$BOOTLOADER_DIR"/files ]; then
             cp -R $BOOTLOADER_DIR/files/* $RELEASE_DIR
           fi
 
-          if [ -f $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader/release ]; then
-            . $PROJECT_DIR/$PROJECT/devices/$DEVICE/bootloader/release
+          if [ -f $HOME/.openelec/projects/$PROJECT/bootloader/release ]; then
+            . $HOME/.openelec/projects/$PROJECT/bootloader/release
+          elif [ -f $HOME/.openelec/bootloader/release ]; then
+            . $HOME/.openelec/bootloader/release
           elif [ -f $PROJECT_DIR/$PROJECT/bootloader/release ]; then
             . $PROJECT_DIR/$PROJECT/bootloader/release
           elif [ -f "$BOOTLOADER_DIR"/release ]; then
@@ -343,22 +322,7 @@ fi
       tar cf $TARGET_IMG/$IMAGE_NAME.tar -C target $IMAGE_NAME
 
     # create image files if requested
-      if [ "$1" = "mkimage" ] && [ "$PROJECT" = "Odroid" ]; then
-        echo "mkimage: boo. now root access (sudo) is required..."
-        echo "mkimage: see scripts/image and scripts/mkimage-odroid if you dont trust"
-        # variables used in image script must be passed
-        sudo env \
-          PATH="$PATH:/sbin" \
-          ROOT="$ROOT" \
-          RELEASE_DIR="$RELEASE_DIR" \
-          INSTALL="$INSTALL" \
-          TARGET_IMG="$TARGET_IMG" \
-          IMAGE_NAME="$IMAGE_NAME" \
-          RESIZE="$RESIZE" \
-          PROJECT="$PROJECT" \
-          DEVICE="$DEVICE" \
-          $SCRIPTS/mkimage-odroid
-      elif [ "$1" = "mkimage" -a -n "$BOOTLOADER" ]; then
+      if [ "$1" = "mkimage" -a -n "$BOOTLOADER" ]; then
         # projects can set KERNEL_NAME (kernel.img)
         if [ -z "$KERNEL_NAME" ] ; then
           KERNEL_NAME="KERNEL"
@@ -447,10 +411,6 @@ fi
     # cleanup release dir
       rm -rf $RELEASE_DIR
 
-    # lets get rid of things we don't care about in $TARGET_IMG
-      mv $TARGET_IMG/$IMAGE_NAME.system $INSTALL/../SYSTEM
-      mv $TARGET_IMG/$IMAGE_NAME.kernel $INSTALL/../KERNEL
-
   elif [ "$1" = "noobs" ]; then
 
     RELEASE_DIR="$TARGET_IMG/${IMAGE_NAME}-$1"
@@ -481,15 +441,13 @@ fi
           -e "s%@KERNEL_VERSION@%$(kernel_version)%g" \
           -e "s%@DESCRIPTION@%$DESCRIPTION%g" \
           -e "s%@ROOT_PASSWORD@%$ROOT_PASSWORD%g" \
+          -e "s%@NOOBS_SUPPORTED_MODELS@%$NOOBS_SUPPORTED_MODELS%g" \
           -e "s%@NOOBS_HEX@%$NOOBS_HEX%g" \
           -i $RELEASE_DIR/${DISTRONAME}_${PROJECT}/os.json
 
       sed -e "s%@DISTRONAME@%$DISTRONAME%g" \
           -e "s%@PROJECT@%$PROJECT%g" \
           -i $RELEASE_DIR/${DISTRONAME}_${PROJECT}/partitions.json
-
-      sed -e "s%@DISTRONAME@%$DISTRONAME%g" \
-          -i $RELEASE_DIR/partitions.json
 
     # create System dir
       mkdir -p $RELEASE_DIR/${DISTRONAME}_${PROJECT}/System
@@ -521,15 +479,6 @@ fi
             cp -PR $overlay $RELEASE_DIR/${DISTRONAME}_${PROJECT}/System/overlays
           fi
         done
-
-        if [ -f $INSTALL/usr/share/bootloader/*.dtb ]; then
-          cp -PR $INSTALL/usr/share/bootloader/*.dtb $RELEASE_DIR/System
-        fi
-
-        if [ -f $INSTALL/usr/share/bootloader/overlays/* ]; then
-          mkdir -p $RELEASE_DIR/System/overlays
-          cp -PR $INSTALL/usr/share/bootloader/overlays/* $RELEASE_DIR/System/overlays
-        fi
 
       # create md5sum's
         ( cd $RELEASE_DIR/${DISTRONAME}_${PROJECT}/System;

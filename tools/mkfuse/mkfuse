@@ -1,6 +1,6 @@
 #!/bin/sh
 
-usage(){ 
+usage(){
   echo "$0 U2|XU3|C1 path/to/image|/dev/mmcblk0"
   exit
 }
@@ -26,12 +26,12 @@ if [ -z $INSTALL ]; then
  # if [ -z $DEVICE -o -z $PROJECT ]; then
  #   UBOOT_DIR="$(dirname $0)/../../$(basename $(ls -d $(dirname $0)/../../build.*${OPENELEC_VERSION}))/image/system/usr/share/bootloader"
  # else
-    UBOOT_DIR="$(dirname $0)/../../$(basename $(ls -d $(dirname $0)/../../build.OpenELEC-Odroid.${1}.*${OPENELEC_VERSION}))/image/system/usr/share/bootloader"
+    UBOOT_DIR="$(dirname $0)/../../$(basename $(ls -d $(dirname $0)/../../build.OpenELEC-Odroid-${1}.*${OPENELEC_VERSION}))/image/system/usr/share/bootloader"
  # fi
 else
   UBOOT_DIR=$INSTALL/usr/share/bootloader
 fi
-UBOOT_FLAGS="conv=notrunc status=none"
+UBOOT_FLAGS="conv=notrunc" # status=none"
 
 case $1 in
   U2|u2|U3|u3|xu3|XU3)
@@ -50,5 +50,12 @@ case $1 in
     fuse $UBOOT_DIR/bl1 $2 512 1 1
     echo "Fusing: U-Boot for Odroid $1"
     fuse $UBOOT_DIR/u-boot $2 512 64 0
+    ;;
+  C2|c2)
+    echo "Fusing: BL1 for Odroid $1"
+    fuse $UBOOT_DIR/bl1 $2 1 0 0 442
+    fuse $UBOOT_DIR/bl1 $2 512 1 1
+    echo "Fusing: U-Boot for Odroid $1"
+    fuse $UBOOT_DIR/u-boot $2 512 97 0
     ;;
 esac
