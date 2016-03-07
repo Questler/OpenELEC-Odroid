@@ -20,9 +20,6 @@
   # Target Configfile for u-boot
     UBOOT_CONFIGFILE="boot.ini"
 
-  # Additional u-boot make parameters (for example to just build u-boot.bin)
-    UBOOT_MAKE_EXTRACMD=""
-
   # Additional kernel make parameters (for example to specify the u-boot loadaddress)
     KERNEL_MAKE_EXTRACMD="dtbs"
 
