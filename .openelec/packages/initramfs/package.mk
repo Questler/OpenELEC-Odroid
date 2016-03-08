@@ -50,12 +50,14 @@ case $PROJECT in
 esac
 
 post_install() {
-  if [ -f "$ROOT/.openelec/projects/$PROJECT/initramfs/init" ]; then
-    install -m 0755 $ROOT/.openelec/projects/$PROJECT/initramfs/init $ROOT/$BUILD/initramfs/init
-  elif [ -f "$ROOT/.openelec/initramfs/init" ]; then
-    sed -e "s|tty1|$TTY|g" $ROOT/.openelec/initramfs/init > $ROOT/$BUILD/initramfs/init
-    chmod 0755 $ROOT/$BUILD/initramfs/init
+  if [ -f "$HOME/.openelec/projects/$PROJECT/initramfs/init" ]; then
+    install -m 0755 $ROOT/.openelec/projects/$PROJECT/initramfs/init $HOME/$BUILD/initramfs/init
+  elif [ -f "$HOME/.openelec/initramfs/init" ]; then
+    sed -e "s|tty1|$TTY|g" $HOME/.openelec/initramfs/init > $HOME/$BUILD/initramfs/init
+  else
+    sed -i "s|tty1|$TTY|g" $HOME/$BUILD/initramfs/init
   fi
+  chmod 0755 $ROOT/$BUILD/initramfs/init
 
   # platform_init
   if [ -f "$ROOT/.openelec/projects/$PROJECT/initramfs/platform_init" ]; then
@@ -65,7 +67,7 @@ post_install() {
   fi
 
   cd $ROOT/$BUILD/initramfs
-    mkdir -p $ROOT/$BUILD/image/
+    mkdir -p $ROOT/$BUILD/image
     find . | cpio -H newc -ov -R 0:0 > $ROOT/$BUILD/image/initramfs.cpio
   cd -
 }

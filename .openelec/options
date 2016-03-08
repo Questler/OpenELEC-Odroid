@@ -36,15 +36,8 @@
   # additional Firmware to use : Additional
     FIRMWARE="$FIRMWARE dvb-firmware rtlnic-firmware samsung-firmware wlan-firmware"
 
-  # build and install PPP support : Override
-    PPTP_SUPPORT="no"
-
-  # build and install OpenVPN support : Override
-    OPENVPN_SUPPORT="no"
-
   # Distribution Specific source location : Additional
-    # ODROID_MIRROR="http://freeweb.mine.nu/zalaare"
-    ODROID_MIRROR="http://zalaare.homenet.org/odroid"
+    ODROID_MIRROR="http://freeweb.mine.nu/zalaare"
 
   # set the addon server
     ADDON_SERVER_URL="https://raw.github.com/zalaare/OpenELEC-Odroid-Addons"
