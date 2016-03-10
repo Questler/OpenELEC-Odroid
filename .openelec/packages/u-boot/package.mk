@@ -49,8 +49,8 @@ make_target() {
       make CROSS_COMPILE="$TARGET_PREFIX" ARCH=arm HOSTCC="$HOST_CC" HOSTSTRIP="true" $UBOOT_MAKE_EXTRACMD
       ;;
     Odroid-C1)
-      make CROSS_COMPILE="arm-none-eabi-" $UBOOT_CONFIG
-      make CROSS_COMPILE="arm-none-eabi-" HOSTCC="$HOST_CC" HOSTSTRIP="true" $UBOOT_MAKE_EXTRACMD
+      make CROSS_COMPILE="arm-none-eabi-" ARCH=arm $UBOOT_CONFIG
+      make CROSS_COMPILE="arm-none-eabi-" ARCH=arm HOSTCC="$HOST_CC" HOSTSTRIP="true" $UBOOT_MAKE_EXTRACMD
       ;;
   esac
 }
