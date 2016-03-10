@@ -75,13 +75,14 @@ trap cleanup SIGINT
 # create part1
   echo "image: creating part1..."
   SYSTEM_PART_END=$(( $SYSTEM_SIZE * 1024 * 1024 / 512 + 2048 ))
-  parted -s "$DISK" -a min unit s mkpart primary fat32 2048 $SYSTEM_PART_END
+  parted -s "$DISK" -a min unit s mkpart primary fat32 3072 $SYSTEM_PART_END
   if [ "$BOOTLOADER" = "syslinux" ]; then
     parted -s "$DISK" set 1 legacy_boot on
   else
     parted -s "$DISK" set 1 boot on
   fi
   sync
+
 # create part2
   echo "image: creating part2..."
   STORAGE_PART_START=$(( $SYSTEM_PART_END + 2048 ))
@@ -100,11 +101,11 @@ fi
 
 # create filesystem on part1
   echo "image: creating filesystem on part1..."
-  OFFSET=$(( 2048 * 512 ))
+  OFFSET=$(( 3072 * 512 ))
   HEADS=4
   TRACKS=32
   SECTORS=$(( $SYSTEM_SIZE * 1024 * 1024 / 512 / $HEADS / $TRACKS ))
-  
+
   shopt -s expand_aliases  # enables alias expansion in script
   alias mformat="mformat -i $DISK@@$OFFSET -h $HEADS -t $TRACKS -s $SECTORS"
   alias mcopy="mcopy -i $DISK@@$OFFSET"
@@ -113,7 +114,7 @@ fi
   if [ "$BOOTLOADER" = "syslinux" ]; then
     mformat -v "$FAT_VOL_ID" -N "$FAT_VOL_ID" ::
   elif [ "$BOOTLOADER" = "bcm2835-bootloader" -o "$BOOTLOADER" = "u-boot" ]; then
-    mformat ::
+    mformat -v "System" ::
   fi
   sync
 
@@ -229,7 +230,7 @@ fi # bootloader
 
 # create filesystem on part2
   echo "image: creating filesystem on part2..."
-  mke2fs -F -q -t ext4 -m 0 "$OE_TMP/part2.ext4"
+  mke2fs -F -q -t ext4 -m 0 -L Storage "$OE_TMP/part2.ext4"
   tune2fs -U $UUID_STORAGE "$OE_TMP/part2.ext4" >"$SAVE_ERROR" 2>&1 || show_error
   e2fsck -n "$OE_TMP/part2.ext4" >"$SAVE_ERROR" 2>&1 || show_error
   sync
