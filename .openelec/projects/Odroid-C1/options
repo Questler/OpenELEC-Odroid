@@ -17,11 +17,8 @@
   # Target Configfile for u-boot
     UBOOT_CONFIGFILE="boot.ini"
 
-  # Kernel config file
-    KERNEL_CFG_FILE="odroidc_defconfig"
-
   # Kernel target (bzImage, zImage, uImage, Image)
-    KERNEL_TARGET="zImage"
+    KERNEL_TARGET="uImage"
 
   # Additional kernel make parameters (for example to specify the u-boot loadaddress)
     KERNEL_MAKE_EXTRACMD="dtbs"

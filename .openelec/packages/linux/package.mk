@@ -20,7 +20,7 @@ PKG_NAME="linux"
 case $PROJECT in
   Odroid-U2)  PKG_VERSION="3.8.13+ddfddf8"  ;;
   Odroid-XU3) PKG_VERSION="3.10.96+87d0617" ;;
-  Odroid-C1)  PKG_VERSION="3.10.80+c5a1115" ;;
+  Odroid-C1)  PKG_VERSION="3.10.80+5dd6734" ;;
   Odroid-C2)  PKG_VERSION="3.14.29+11e207c" ;;
 esac
 PKG_URL="$ODROID_MIRROR/$PKG_NAME-$PKG_VERSION.tar.xz"
