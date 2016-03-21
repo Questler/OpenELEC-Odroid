@@ -44,12 +44,29 @@ fi
     fi
   done
 
-echo "*** updating u-boot for Odroid on: $BOOT_DISK ..."
+# stop if on eMMC that won't accept the new bootloader
+if [ -f /sys/block/${BOOT_DISK}boot0/force_ro ]; then
+  emmc=1
+  D="eMMC"
+  device=/dev/${BOOT_DISK}boot0
+  if ! echo 0 > /sys/block/${BOOT_DISK}boot0/force_ro; then
+    msgbox "I've found a running eMMC but I couldn't get it to accept the new bootloaders."
+    exit
+  fi
+fi
 
-dd bs=512 if=$SYSTEM_ROOT/usr/share/bootloader/bl1 of=$BOOT_DISK seek=1
-dd bs=512 if=$SYSTEM_ROOT/usr/share/bootloader/bl2 of=$BOOT_DISK seek=31
-dd bs=512 if=$SYSTEM_ROOT/usr/share/bootloader/u-boot of=$BOOT_DISK seek=63
-dd bs=512 if=$SYSTEM_ROOT/usr/share/bootloader/tzsw of=$BOOT_DISK seek=2111
+echo "*** updating u-boot for Odroid on: $BOOT_DISK ..."
+if [ -n "${emmc}" ]; then
+  dd bs=512 if=$SYSTEM_ROOT/usr/share/bootloader/bl1 of=$BOOT_DISK seek=0
+  dd bs=512 if=$SYSTEM_ROOT/usr/share/bootloader/bl2 of=$BOOT_DISK seek=30
+  dd bs=512 if=$SYSTEM_ROOT/usr/share/bootloader/u-boot of=$BOOT_DISK seek=62
+  dd bs 512 if=$SYSTEM_ROOT/usr/share/bootloader/tzsw of=$BOOT_DISK seek=2110
+else
+  dd bs=512 if=$SYSTEM_ROOT/usr/share/bootloader/bl1 of=$BOOT_DISK seek=1
+  dd bs=512 if=$SYSTEM_ROOT/usr/share/bootloader/bl2 of=$BOOT_DISK seek=31
+  dd bs=512 if=$SYSTEM_ROOT/usr/share/bootloader/u-boot of=$BOOT_DISK seek=63
+  dd bs=512 if=$SYSTEM_ROOT/usr/share/bootloader/tzsw of=$BOOT_DISK seek=2111
+fi
 
 # mount $BOOT_ROOT r/o
   sync

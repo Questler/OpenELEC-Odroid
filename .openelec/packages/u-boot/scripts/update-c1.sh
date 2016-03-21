@@ -44,8 +44,18 @@ fi
     fi
   done
 
-echo "*** updating u-boot for Odroid on: $BOOT_DISK ..."
+# stop if on eMMC that won't accept the new bootloader
+if [ -f /sys/block/${BOOT_DISK}boot0/force_ro ]; then
+  emmc=1
+  D="eMMC"
+  device=/dev/${BOOT_DISK}boot0
+  if ! echo 0 > /sys/block/${BOOT_DISK}boot0/force_ro; then
+    msgbox "I've found a running eMMC but I couldn't get it to accept the new bootloaders."
+    exit
+  fi
+fi
 
+echo "*** updating u-boot for Odroid on: $BOOT_DISK ..."
 dd bs=1 if=$SYSTEM_ROOT/usr/share/bootloader/bl1 of=$BOOT_DISK count=442
 dd bs=512 if=$SYSTEM_ROOT/usr/share/bootloader/bl1 of=$BOOT_DISK seek=1 skip=1
 dd bs=512 if=$SYSTEM_ROOT/usr/share/bootloader/u-boot of=$BOOT_DISK seek=64
