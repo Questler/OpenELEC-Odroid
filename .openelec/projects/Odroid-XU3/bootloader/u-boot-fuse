@@ -4,4 +4,4 @@ echo "image: fusing for odroid-xu3..."
 dd if="$RELEASE_DIR/3rdparty/bootloader/bl1" of="$DISK" conv=fsync,notrunc bs=512 seek=1 >"$SAVE_ERROR" 2>&1 || show_error
 dd if="$RELEASE_DIR/3rdparty/bootloader/bl2" of="$DISK" conv=fsync,notrunc bs=512 seek=31 >"$SAVE_ERROR" 2>&1 || show_error
 dd if="$RELEASE_DIR/3rdparty/bootloader/u-boot" of="$DISK" conv=fsync,notrunc bs=512 seek=63 >"$SAVE_ERROR" 2>&1 || show_error
-dd if="$RELEASE_DIR/3rdparty/bootloader/tzsw" of="$DISK" conv=fsync,notrunc bs=512 seek=719 >"$SAVE_ERROR" 2>&1 || show_error
+dd if="$RELEASE_DIR/3rdparty/bootloader/tzsw" of="$DISK" conv=fsync,notrunc bs=512 seek=2111 >"$SAVE_ERROR" 2>&1 || show_error
