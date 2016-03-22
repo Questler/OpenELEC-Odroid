@@ -18,12 +18,23 @@
 
 PKG_NAME="linux"
 case $PROJECT in
-  Odroid-U2)  PKG_VERSION="3.8.13+ddfddf8"  ;;
-  Odroid-XU3) PKG_VERSION="3.10.96+87d0617" ;;
-  Odroid-C1)  PKG_VERSION="3.10.80+5dd6734" ;;
-  Odroid-C2)  PKG_VERSION="3.14.29+11e207c" ;;
+  Odroid-U2)
+    PKG_VERSION="3.8.13+ddfddf8"
+    PKG_URL="$ODROID_MIRROR/$PKG_NAME-$PKG_VERSION.tar.xz"
+    ;;
+  Odroid-XU3)
+    PKG_VERSION="3.10.96+87d0617"
+    PKG_URL="$ODROID_MIRROR/$PKG_NAME-$PKG_VERSION.tar.xz"
+    ;;
+  Odroid-C1)
+    PKG_VERSION="3.10.80+5dd6734"
+    PKG_URL="$ODROID_MIRROR/$PKG_NAME-$PKG_VERSION.tar.xz"
+    ;;
+  Odroid-C2)
+    PKG_VERSION="8255e26ae4c786bb0a143c76dda79a69291a3d22"
+    PKG_URL="https://github.com/hardkernel/linux/archive/8255e26ae4c786bb0a143c76dda79a69291a3d22.zip"
+    ;;
 esac
-PKG_URL="$ODROID_MIRROR/$PKG_NAME-$PKG_VERSION.tar.xz"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -43,6 +54,15 @@ PKG_AUTORECONF="no"
 if [ "$BUILD_ANDROID_BOOTIMG" = "yes" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET mkbootimg:host"
 fi
+
+unpack() {
+  case $PROJECT in
+    Odroid-C2)
+      FILE="`basename $PKG_URL`"
+      7za x -o$ROOT/$BUILD $ROOT/$SOURCES/$PKG_NAME/$FILE >/dev/null
+      ;;
+esac
+}
 
 post_patch() {
   if [ -f $PROJECT_DIR/$PROJECT/$PKG_NAME/$PKG_NAME.$TARGET_ARCH.conf ]; then
