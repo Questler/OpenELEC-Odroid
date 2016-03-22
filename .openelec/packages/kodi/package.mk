@@ -17,12 +17,11 @@
 ################################################################################
 
 PKG_NAME="kodi"
-PKG_VERSION="16.0-a5f3a99"
+PKG_VERSION="321dc15d0f630712b0915d5222879c510dd5e667"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="http://www.kodi.tv"
-PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
+PKG_URL="https://github.com/Owersun/xbmc/archive/$PKG_VERSION.zip"
 PKG_DEPENDS_TARGET="toolchain kodi:host libsquish boost Python zlib bzip2 systemd pciutils lzo pcre swig:host libass curl rtmpdump fontconfig fribidi tinyxml libjpeg-turbo libpng tiff freetype jasper libogg libcdio libmpeg2 taglib libxml2 libxslt yajl sqlite libvorbis ffmpeg crossguid giflib"
 PKG_DEPENDS_HOST="lzo:host libpng:host libjpeg-turbo:host giflib:host"
 PKG_PRIORITY="optional"
@@ -285,6 +284,13 @@ PKG_CONFIGURE_OPTS_TARGET="gl_cv_func_gettimeofday_clobber=no \
                            --with-ffmpeg=shared \
                            $KODI_CODEC \
                            $KODI_PLAYER"
+
+
+unpack() {
+  FILE="`basename $PKG_URL`"
+  7z x -o$ROOT/$BUILD $ROOT/$SOURCES/$PKG_NAME/$FILE >/dev/null
+  mv $ROOT/$BUILD/xbmc-$PKG_VERSION $ROOT/$BUILD/$PKG_NAME-$PKG_VERSION
+}
 
 pre_configure_host() {
 # kodi fails to build in subdirs
