@@ -20,7 +20,7 @@ PKG_NAME="u-boot"
 case $PROJECT in
   Odroid-U2|Odroid-XU3) PKG_VERSION="2015.10"         ; PKG_URL="ftp://ftp.denx.de/pub/u-boot/u-boot-$PKG_VERSION.tar.bz2" ;;
   Odroid-C1)            PKG_VERSION="2011.03+e7d4447" ; PKG_URL="$ODROID_MIRROR/$PKG_NAME-$PKG_VERSION.tar.xz" ; PKG_OTHER_DEPENDS="linaro-arm-toolchain:host" ;;
-  Odroid-C2)            PKG_VERSION="2015.01+beda694" ; PKG_URL="$ODROID_MIRROR/$PKG_NAME-$PKG_VERSION.tar.xz" ; PKG_OTHER_DEPENDS="linaro-aarch64-toolchain:host" ;;
+  Odroid-C2)            PKG_VERSION="s905_5.1.1_v1.1" ; PKG_URL="https://github.com/hardkernel/u-boot/archive/s905_5.1.1_v1.1.tar.gz" ; PKG_OTHER_DEPENDS="linaro-aarch64-toolchain:host" ;;
 esac
 PKG_SITE="http://www.denx.de/wiki/U-Boot/WebHome"
 PKG_REV="1"
@@ -41,6 +41,16 @@ pre_configure_target() {
 # dont use some optimizations because of problems
   MAKEFLAGS=-j1
 }
+
+unpack() {
+  case $PROJECT in
+    Odroid-C2)
+	  FILE="`basename $PKG_URL`"
+	  tar xzf $ROOT/$SOURCES/$PKG_NAME/$FILE -C $ROOT/$BUILD
+      ;;
+  esac
+}
+
 
 make_target() {
   case $PROJECT in
