@@ -17,24 +17,25 @@
 ################################################################################
 
 PKG_NAME="mali"
-PKG_VERSION="r5p0-01rel0"
+PKG_VERSION="20160319-r5p1-1_arm64"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="nonfree"
-PKG_SITE="http://openlinux.amlogic.com:8000/download/ARM/filesystem/"
-PKG_URL="http://malideveloper.arm.com/downloads/drivers/binary/utgard/r5p0-01rel0/mali-450_${PKG_VERSION}_linux_1+fbdev+arm64-v8a.tar.gz"
+PKG_URL="http://oph.mdrjr.net/odrobian/pool/s905/m/mali-fbdev/mali-fbdev_20160319-r5p1-1_arm64.deb"
 PKG_DEPENDS_TARGET="toolchain mesa-headers:host"
 PKG_PRIORITY="optional"
 PKG_SECTION="graphics"
 PKG_SHORTDESC="Pre-compiled libraries for Mali 450 GPUs"
 PKG_LONGDESC="Pre-compiled libraries for Mali 450 GPUs"
-PKG_SOURCE_DIR="fbdev"
+#PKG_SOURCE_DIR="fbdev"
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 unpack() {
-  $SCRIPTS/extract $PKG_NAME $(basename $PKG_URL) $BUILD
+  mkdir $ROOT/$BUILD/$PKG_NAME-$PKG_VERSION
+  FILE="`basename $PKG_URL`"
+  ar p $ROOT/$SOURCES/$PKG_NAME/$FILE data.tar.xz | xz -dc | tar -C $ROOT/$BUILD/$PKG_NAME-$PKG_VERSION -xf -
 }
   
 make_target() {
@@ -43,9 +44,9 @@ make_target() {
 
 makeinstall_target() {
   mkdir -p $SYSROOT_PREFIX/usr/lib
-    cp -PR *.so* $SYSROOT_PREFIX/usr/lib
+    cp -PR ./usr/lib/aarch64-linux-gnu/mali-egl/lib*.so* $SYSROOT_PREFIX/usr/lib
   mkdir -p $INSTALL/usr/lib
-    cp -PR *.so* $INSTALL/usr/lib
+    cp -PR ./usr/lib/aarch64-linux-gnu/mali-egl/lib*.so* $INSTALL/usr/lib
 }
 
 post_install() {
